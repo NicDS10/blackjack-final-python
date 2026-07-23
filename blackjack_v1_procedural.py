@@ -591,3 +591,4 @@ while running:
     time.sleep(1.5)
     print("Il banco sta mischiando le carte...")
     print()
+    ptint("sbomblon")
