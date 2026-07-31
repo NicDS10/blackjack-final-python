@@ -1,11 +1,25 @@
 import random
 
 class Carta:
-    def __init__(self, figura, seme, nome):
+    def __init__(self, figura, seme, nome, valore):
         self.figura = figura
         self.seme = seme
         self.nome = nome
-        self.valore = 0
+        self.valore = valore
+
+    def asso(self):
+        value = int(input("Inserisci un valore per l'asso (1/11): "))
+        while True:
+            try:
+                value = int(value)
+                match value:
+                    case 1 | 11:
+                        self.valore = value
+                        break
+                    case _:
+                        value = int(input("Devi inserire uno tra i due numeri (1/11): "))
+            except ValueError:
+                value = input("Devi inserire un numero: ")
 
 class Mazzo:
     mazzo = []
@@ -21,17 +35,30 @@ class Mazzo:
         for seme in semi:
             for figura in figure:
                 nome = f"{figura} di {seme}"
-                cls.mazzo.append(Carta(figura, seme, nome))
+                match figura:
+                    case "J" | "Q" | "K":
+                        valore = 10
+                    case "A":
+                        valore = (1, 11)
+                    case _:
+                        valore = int(figura)
+                cls.mazzo.append(Carta(figura, seme, nome, valore))
 
     @classmethod
     def distribuire_carte(cls, num):
-        for i in range(num):
-            carta = cls.mazzo.pop(0)
-            Giocatore.mano.append(carta)
+        if num == 2:
+            for i in range(num):
+                carta = cls.mazzo.pop(0)
+                Giocatore.mano.append(carta)
+        else:
+            for i in range(num - 2):
+                carta = cls.mazzo.pop(0)
+                Giocatore.mano.append(carta)
 
 class Giocatore:
     mano = []
     grafica_mano = []
+    punti = 0
     def __init__(self, nome, scommessa):
         self.nome = nome
         self.scommessa = scommessa
@@ -63,7 +90,8 @@ class Giocatore:
                        "|           |",
                        f"|        {carta.figura:>2} |",
                        r" \---------/ ")
-            cls.grafica_mano.append(grafica)
+            if grafica not in cls.grafica_mano:
+                cls.grafica_mano.append(grafica)
 
         horiz = 0
         for riga in range(7):
@@ -72,11 +100,39 @@ class Giocatore:
             horiz += 1
             print()
 
-class Banco(Giocatore):
-    pass
+    @classmethod
+    def calcola_punteggio(cls):
+        punteggio = 0
+        for carta in cls.mano:
+            if carta.valore == (1, 11):
+                carta.asso()
+                punteggio += carta.valore
+            else:
+                punteggio += carta.valore
+        cls.punti += (punteggio - cls.punti)
 
-alex = Giocatore("Alex", scommessa = -100)
+class Banco(Giocatore):
+    mano = []
+    grafica_mano = []
+    punti = 0
+
+    @classmethod
+    def mostra_mano(cls):
+        super().mostra_mano()
+
+    @classmethod
+    def calcola_punteggio(cls):
+        super().calcola_punteggio()
+
+
+alex = Giocatore("Alex", 100)
 Mazzo.crea_mazzo()
 Mazzo.shuffle()
-Mazzo.distribuire_carte(6)
+Mazzo.distribuire_carte(2)
 alex.mostra_mano()
+alex.calcola_punteggio()
+print(Giocatore.punti)
+Mazzo.distribuire_carte(3)
+alex.mostra_mano()
+alex.calcola_punteggio()
+print(Giocatore.punti)
