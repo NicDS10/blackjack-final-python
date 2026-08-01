@@ -204,10 +204,10 @@ class Banco(Giocatore):
     def prendere(cls):
         turn = 3
         while cls.punti < 17:
-            Banco.distribuire_carte(turn)
-            Banco.mostra_mano()
-            Banco.calcola_punteggio()
-            print(Banco.punti)
+            cls.distribuire_carte(turn)
+            cls.mostra_mano()
+            cls.calcola_punteggio()
+            print(cls.punti)
             turn += 1
 
 class Gioco:
