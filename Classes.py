@@ -7,19 +7,28 @@ class Carta:
         self.nome = nome
         self.valore = valore
 
-    def asso(self):
-        value = int(input("Inserisci un valore per l'asso (1/11): "))
-        while True:
-            try:
-                value = int(value)
-                match value:
-                    case 1 | 11:
-                        self.valore = value
-                        break
-                    case _:
-                        value = int(input("Devi inserire uno tra i due numeri (1/11): "))
-            except ValueError:
-                value = input("Devi inserire un numero: ")
+    def asso(self, carta):
+        if carta in Banco.mano:
+            if Banco.punti + 11 > 21:
+                self.valore = 1
+            else:
+                self.valore = 11
+        else:
+            if Giocatore.punti + 11 > 21:
+                self.valore = 1
+            else:
+                value = int(input("Inserisci un valore per l'asso (1/11): "))
+                while True:
+                    try:
+                        value = int(value)
+                        match value:
+                            case 1 | 11:
+                                self.valore = value
+                                break
+                            case _:
+                                value = int(input("Devi inserire uno tra i due numeri (1/11): "))
+                    except ValueError:
+                        value = input("Devi inserire un numero: ")
 
 class Mazzo:
     mazzo = []
@@ -104,7 +113,7 @@ class Giocatore:
         punteggio = 0
         for carta in cls.mano:
             if carta.valore == (1, 11):
-                carta.asso()
+                carta.asso(carta)
                 punteggio += carta.valore
             else:
                 punteggio += carta.valore
