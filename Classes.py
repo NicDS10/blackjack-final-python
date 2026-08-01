@@ -1,4 +1,5 @@
 import random
+# import time
 
 class Carta:
     def __init__(self, figura, seme, nome, valore):
