@@ -112,7 +112,67 @@ class Giocatore:
 
     @classmethod
     def distribuire_carte(cls, num):
-        pass
+        if num == 2:
+            if cls.mano[0].valore == 0:
+                cls.mano.append(Mazzo.mazzo.pop(0))
+            else:
+                for _ in range(num):
+                    cls.mano.append(Mazzo.mazzo.pop(0))
+        elif num == 3 and cls.mano[0].valore == 0:
+            del cls.mano[0]
+            cls.mano.insert(0, Mazzo.mazzo.pop(0))
+        elif (num - 2) == len(cls.mano):
+            for _ in range(num - len(cls.mano) - 1):
+                cls.mano.append(Mazzo.mazzo.pop(0))
+
+    def risultati(self):
+        if Giocatore.punti == 21 and len(Giocatore.mano) == 2 and Banco.punti != 21:
+            self.scommessa = (self.scommessa * 5) / 2
+            print(f"Blackjack! Riscuoti {self.scommessa} euro!!")
+        elif Giocatore.punti == Banco.punti or (Giocatore.punti > 21 and Banco.punti > 21):
+            print(f"La tua scommessa rimane intoccata, ed ammonta a {self.scommessa} euro!!")
+        elif 21 >= Giocatore.punti > Banco.punti or Banco.punti > 21 > Giocatore.punti:
+            self.scommessa *= 2
+            print(f"Hai vinto!! Riscuoti {self.scommessa} euro!!")
+        else:
+            print(f"Hai perso {self.scommessa} euro!!")
+            self.scommessa = 0
+
+    def giocare_ancora(self):
+        decisione = input("Vuoi continuare (Sì/No)? ").capitalize()
+        while decisione != "Sì" and decisione != "Si" and decisione != "No":
+            decisione = input("Devi scegliere tra <Sì> e <No>: ").capitalize()
+        if decisione == "No":
+            Gioco.is_running = False
+        old_bet = self.scommessa
+
+        nuova_scommessa = input("Inserisci la nuova scommessa: ")
+        while self.scommessa == 0:
+            try:
+                nuova_scommessa = int(nuova_scommessa)
+                if nuova_scommessa <= 0:
+                    nuova_scommessa = int(input("Devi inserire un numero maggiore di 0: "))
+                else:
+                    self.scommessa = nuova_scommessa
+            except ValueError:
+                nuova_scommessa = input("Devi inserire un numero: ")
+
+        if old_bet > 0:
+            decision = input("Vuoi aggiungere una scommessa (Sì/No)? ").capitalize()
+            while decision != "Sì" and decision != "Si" and decision != "No":
+                decision = input("Devi scegliere tra <Sì> e <No>: ").capitalize()
+            if decision == "Sì" or decision == "Si":
+                aggiunta_scommessa = input("Inserisci la somma da aggiungere alla scommessa: ")
+                while True:
+                    try:
+                        aggiunta_scommessa = int(aggiunta_scommessa)
+                        if aggiunta_scommessa <= 0:
+                            aggiunta_scommessa = int(input("Devi inserire un numero maggiore di 0: "))
+                        else:
+                            self.scommessa += aggiunta_scommessa
+                            break
+                    except ValueError:
+                        aggiunta_scommessa = input("Devi inserire un numero: ")
 
 class Banco(Giocatore):
     mano = []
@@ -133,4 +193,25 @@ class Banco(Giocatore):
 
     @classmethod
     def prendere(cls):
-        pass
+        turn = 3
+        while cls.punti < 17:
+            Banco.distribuire_carte(turn)
+            Banco.mostra_mano()
+            Banco.calcola_punteggio()
+            print(Banco.punti)
+            turn += 1
+
+class Gioco:
+    is_running = True
+
+    @staticmethod
+    def presentazione():
+        print("----------------- Benvenuto su Blackjack!! -----------------")
+
+    @staticmethod
+    def turno_giocatore():
+        print("----------------- È il tuo turno! -----------------")
+
+    @staticmethod
+    def turno_banco():
+        print("----------------- È il turno del banco! -----------------")
