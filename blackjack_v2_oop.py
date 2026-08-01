@@ -1,4 +1,4 @@
-import Classes
+from Classes import *
 import time
 import random
 

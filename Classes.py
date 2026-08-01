@@ -32,6 +32,7 @@ class Mazzo:
     def crea_mazzo(cls):
         semi = ("♥", "♦", "♣", "♠")
         figure = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
+        Banco.mano.append(Carta(0, 0, 0, 0))
         for seme in semi:
             for figura in figure:
                 nome = f"{figura} di {seme}"
@@ -43,17 +44,6 @@ class Mazzo:
                     case _:
                         valore = int(figura)
                 cls.mazzo.append(Carta(figura, seme, nome, valore))
-
-    @classmethod
-    def distribuire_carte(cls, num):
-        if num == 2:
-            for i in range(num):
-                carta = cls.mazzo.pop(0)
-                Giocatore.mano.append(carta)
-        else:
-            for i in range(num - 2):
-                carta = cls.mazzo.pop(0)
-                Giocatore.mano.append(carta)
 
 class Giocatore:
     mano = []
@@ -82,16 +72,25 @@ class Giocatore:
 
     @classmethod
     def mostra_mano(cls):
+        cls.grafica_mano = []
         for carta in cls.mano:
-            grafica = (r" /---------\ ",
-                       f"| {carta.figura:>2}        |",
-                       "|           |",
-                       f"|     {carta.seme}     |",
-                       "|           |",
-                       f"|        {carta.figura:>2} |",
-                       r" \---------/ ")
-            if grafica not in cls.grafica_mano:
-                cls.grafica_mano.append(grafica)
+            if carta.valore == 0:
+                grafica = ("?????????????",
+                           "?  ?        ?",
+                           "?           ?",
+                           "?     ?     ?",
+                           "?           ?",
+                           "?        ?  ?",
+                           "?????????????")
+            else:
+                grafica = (r" /---------\ ",
+                           f"| {carta.figura:>2}        |",
+                           "|           |",
+                           f"|     {carta.seme}     |",
+                           "|           |",
+                           f"|        {carta.figura:>2} |",
+                           r" \---------/ ")
+            cls.grafica_mano.append(grafica)
 
         horiz = 0
         for riga in range(7):
@@ -111,6 +110,10 @@ class Giocatore:
                 punteggio += carta.valore
         cls.punti += (punteggio - cls.punti)
 
+    @classmethod
+    def distribuire_carte(cls, num):
+        pass
+
 class Banco(Giocatore):
     mano = []
     grafica_mano = []
@@ -124,15 +127,10 @@ class Banco(Giocatore):
     def calcola_punteggio(cls):
         super().calcola_punteggio()
 
+    @classmethod
+    def distribuire_carte(cls, num):
+        super().distribuire_carte(num)
 
-alex = Giocatore("Alex", 100)
-Mazzo.crea_mazzo()
-Mazzo.shuffle()
-Mazzo.distribuire_carte(2)
-alex.mostra_mano()
-alex.calcola_punteggio()
-print(Giocatore.punti)
-Mazzo.distribuire_carte(3)
-alex.mostra_mano()
-alex.calcola_punteggio()
-print(Giocatore.punti)
+    @classmethod
+    def prendere(cls):
+        pass
