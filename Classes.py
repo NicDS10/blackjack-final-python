@@ -8,41 +8,17 @@ class Carta:
         self.nome = nome
         self.valore = valore
 
-    def asso(self, carta):
-        if carta in Banco.mano:
-            if Banco.punti + 11 > 21:
-                self.valore = 1
-            else:
-                self.valore = 11
-        else:
-            if Giocatore.punti + 11 > 21:
-                self.valore = 1
-            else:
-                value = int(input("Inserisci un valore per l'asso (1/11): "))
-                while True:
-                    try:
-                        value = int(value)
-                        match value:
-                            case 1 | 11:
-                                self.valore = value
-                                break
-                            case _:
-                                value = int(input("Devi inserire uno tra i due numeri (1/11): "))
-                    except ValueError:
-                        value = input("Devi inserire un numero: ")
-
 class Mazzo:
-    mazzo = []
+    def __init__(self):
+        self.mazzo = []
 
-    @classmethod
-    def shuffle(cls):
-        random.shuffle(cls.mazzo)
+    def shuffle(self):
+        random.shuffle(self.mazzo)
 
-    @classmethod
-    def crea_mazzo(cls):
+    def crea_mazzo(self, banco, player):
         semi = ("♥", "♦", "♣", "♠")
         figure = ("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A")
-        Banco.mano.append(Carta(0, 0, 0, 0))
+        banco.mano.append(Carta(0, 0, 0, 0))
         for seme in semi:
             for figura in figure:
                 nome = f"{figura} di {seme}"
@@ -53,15 +29,17 @@ class Mazzo:
                         valore = (1, 11)
                     case _:
                         valore = int(figura)
-                cls.mazzo.append(Carta(figura, seme, nome, valore))
+                self.mazzo.append(Carta(figura, seme, nome, valore))
+        self.shuffle()
+        player.mano.append(self.mazzo.pop(0))
 
 class Giocatore:
-    mano = []
-    grafica_mano = []
-    punti = 0
     def __init__(self, nome, scommessa):
         self.nome = nome
         self.scommessa = scommessa
+        self.mano = []
+        self.grafica_mano = []
+        self.punti = 0
 
     @property
     def scommessa(self):
@@ -80,10 +58,9 @@ class Giocatore:
             except ValueError:
                 importo = input("Devi inserire un numero: ")
 
-    @classmethod
-    def mostra_mano(cls):
-        cls.grafica_mano = []
-        for carta in cls.mano:
+    def mostra_mano(self):
+        self.grafica_mano = []
+        for carta in self.mano:
             if carta.valore == 0:
                 grafica = ("?????????????",
                            "?  ?        ?",
@@ -100,70 +77,68 @@ class Giocatore:
                            "|           |",
                            f"|        {carta.figura:>2} |",
                            r" \---------/ ")
-            cls.grafica_mano.append(grafica)
+            self.grafica_mano.append(grafica)
 
         horiz = 0
         for riga in range(7):
-            for sezione in cls.grafica_mano:
+            for sezione in self.grafica_mano:
                 print(sezione[horiz], end=" ")
             horiz += 1
             print()
 
-    @classmethod
-    def calcola_punteggio(cls):
+    def calcola_punteggio(self, banco):
         punteggio = 0
-        for carta in cls.mano:
+        for carta in self.mano:
             if carta.valore == (1, 11):
-                carta.asso(carta)
+                self.asso(carta, banco)
                 punteggio += carta.valore
             else:
                 punteggio += carta.valore
-        cls.punti += (punteggio - cls.punti)
+        self.punti += (punteggio - self.punti)
+        print(self.punti)
 
-    @classmethod
-    def distribuire_carte(cls, num):
+    def distribuire_carte(self, num, carte):
         if num == 2:
-            if cls.mano[0].valore == 0:
-                cls.mano.append(Mazzo.mazzo.pop(0))
+            if self.mano[0].valore == 0:
+                self.mano.append(carte.mazzo.pop(0))
             else:
-                for _ in range(num):
-                    cls.mano.append(Mazzo.mazzo.pop(0))
-        elif num == 3 and cls.mano[0].valore == 0:
-            del cls.mano[0]
-            cls.mano.insert(0, Mazzo.mazzo.pop(0))
-        elif (num - 2) == len(cls.mano):
-            for _ in range(num - len(cls.mano) - 1):
-                cls.mano.append(Mazzo.mazzo.pop(0))
+                self.mano.append(carte.mazzo.pop(0))
+        elif num == 3 and self.mano[0].valore == 0:
+            del self.mano[0]
+            self.mano.insert(0, carte.mazzo.pop(0))
+        elif (num - 2) == len(self.mano):
+            for _ in range(num - len(self.mano) - 1):
+                self.mano.append(carte.mazzo.pop(0))
 
-    def risultati(self):
-        if Giocatore.punti == 21 and len(Giocatore.mano) == 2 and Banco.punti != 21:
-            self.scommessa = (self.scommessa * 5) / 2
-            print(f"Blackjack! Riscuoti {self.scommessa} euro!!")
-        elif Giocatore.punti == Banco.punti or (Giocatore.punti > 21 and Banco.punti > 21):
-            print(f"La tua scommessa rimane intoccata, ed ammonta a {self.scommessa} euro!!")
-        elif 21 >= Giocatore.punti > Banco.punti or Banco.punti > 21 > Giocatore.punti:
-            self.scommessa *= 2
-            print(f"Hai vinto!! Riscuoti {self.scommessa} euro!!")
+    def risultati(self, banco):
+        if self.punti == 21 and len(self.mano) == 2 and banco.punti != 21:
+            self._scommessa = (self._scommessa * 5) / 2
+            print(f"Blackjack! Riscuoti {self._scommessa} euro!!")
+        elif self.punti == banco.punti or (self.punti > 21 and banco.punti > 21):
+            print(f"La tua scommessa rimane intoccata, ed ammonta a {self._scommessa} euro!!")
+        elif 21 >= self.punti > banco.punti or banco.punti > 21 > self.punti:
+            self._scommessa *= 2
+            print(f"Hai vinto!! Riscuoti {self._scommessa} euro!!")
         else:
-            print(f"Hai perso {self.scommessa} euro!!")
-            self.scommessa = 0
+            print(f"Hai perso {self._scommessa} euro!!")
+            self._scommessa = 0
 
     def giocare_ancora(self):
         decisione = input("Vuoi continuare (Sì/No)? ").capitalize()
         while decisione != "Sì" and decisione != "Si" and decisione != "No":
             decisione = input("Devi scegliere tra <Sì> e <No>: ").capitalize()
         if decisione == "No":
-            Gioco.is_running = False
-        old_bet = self.scommessa
+            Game.is_running = False
+        old_bet = self._scommessa
 
         nuova_scommessa = input("Inserisci la nuova scommessa: ")
-        while self.scommessa == 0:
+        while self._scommessa == 0:
             try:
                 nuova_scommessa = int(nuova_scommessa)
                 if nuova_scommessa <= 0:
                     nuova_scommessa = int(input("Devi inserire un numero maggiore di 0: "))
                 else:
-                    self.scommessa = nuova_scommessa
+                    self._scommessa = nuova_scommessa
             except ValueError:
                 nuova_scommessa = input("Devi inserire un numero: ")
 
@@ -179,39 +154,71 @@ class Giocatore:
                         if aggiunta_scommessa <= 0:
                             aggiunta_scommessa = int(input("Devi inserire un numero maggiore di 0: "))
                         else:
-                            self.scommessa += aggiunta_scommessa
+                            self._scommessa += aggiunta_scommessa
                             break
                     except ValueError:
                         aggiunta_scommessa = input("Devi inserire un numero: ")
 
-class Banco(Giocatore):
-    mano = []
-    grafica_mano = []
-    punti = 0
+    def asso(self, carta, banco):
+        if carta in banco.mano:
+            if banco.punti + 11 > 21:
+                carta.valore = 1
+            else:
+                carta.valore = 11
+        else:
+            if self.punti + 11 > 21:
+                carta.valore = 1
+            else:
+                value = int(input("Inserisci un valore per l'asso (1/11): "))
+                while True:
+                    try:
+                        value = int(value)
+                        match value:
+                            case 1 | 11:
+                                carta.valore = value
+                                break
+                            case _:
+                                value = int(input("Devi inserire uno tra i due numeri (1/11): "))
+                    except ValueError:
+                        value = input("Devi inserire un numero: ")
 
-    @classmethod
-    def mostra_mano(cls):
+    def continuare(self, carte, banco):
+        turno = 3
+        dec = "Prendere"
+        while self.punti < 21 and dec == "Prendere":
+            self.distribuire_carte(turno, carte)
+            self.mostra_mano()
+            self.calcola_punteggio(banco)
+            turno += 1
+            dec = input("Vuoi continuare (prendere/lasciare)? ").capitalize()
+            while dec != "Prendere" and dec != "Lasciare":
+                dec= input("Devi scegliere tra <prendere> e <lasciare>: ").capitalize()
+
+class Banco(Giocatore):
+    def __init__(self):
+        super().__init__(nome = "", scommessa = 1)
+        self.mano = []
+        self.grafica_mano = []
+        self.punti = 0
+
+    def mostra_mano(self):
         super().mostra_mano()
 
-    @classmethod
-    def calcola_punteggio(cls):
-        super().calcola_punteggio()
+    def calcola_punteggio(self, banco):
+        super().calcola_punteggio(banco)
 
-    @classmethod
-    def distribuire_carte(cls, num):
-        super().distribuire_carte(num)
+    def distribuire_carte(self, num, carte):
+        super().distribuire_carte(num, carte)
 
-    @classmethod
-    def prendere(cls):
+    def prendere(self, carte, banco):
         turn = 3
-        while cls.punti < 17:
-            cls.distribuire_carte(turn)
-            cls.mostra_mano()
-            cls.calcola_punteggio()
-            print(cls.punti)
+        while self.punti < 17:
+            self.distribuire_carte(turn, carte)
+            self.mostra_mano()
+            self.calcola_punteggio(banco)
             turn += 1
 
-class Gioco:
+class Game:
     is_running = True
 
     @staticmethod
