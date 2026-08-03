@@ -43,7 +43,7 @@ class Giocatore:
 
     @property
     def scommessa(self):
-        return self.scommessa
+        return self._scommessa
 
     @scommessa.setter
     def scommessa(self, importo):
@@ -226,15 +226,6 @@ class Banco(Giocatore):
         self.grafica_mano = []
         self.punti = 0
         self.turni = 0
-
-    def mostra_mano(self):
-        super().mostra_mano()
-
-    def calcola_punteggio(self, banco):
-        super().calcola_punteggio(banco)
-
-    def distribuire_carte(self, num, carte):
-        super().distribuire_carte(num, carte)
 
     def prendere(self, carte, banco):
         turn = 3
