@@ -83,7 +83,6 @@ class Giocatore:
         for riga in range(7):
             for sezione in self.grafica_mano:
                 print(sezione[horiz], end=" ")
-                time.sleep(0.03)
             horiz += 1
             print()
 
@@ -96,7 +95,17 @@ class Giocatore:
             else:
                 punteggio += carta.valore
         self.punti += (punteggio - self.punti)
-        print(self.punti)
+        if self.mano[0].valore == 0 or banco.turni > 1:
+            print(f"Il punteggio del banco è {self.punti}")
+            banco.turni += 1
+            if self.punti > 21:
+                print("Il banco ha sballato!")
+        else:
+            print(f"Il tuo punteggio è {self.punti}")
+            if self.punti > 21:
+                print("Hai sballato!")
+            if punteggio == 21 and len(self.mano) == 2 and self.mano[-1].valore == 10:
+                print("Hai fatto Blackjack!")
 
     def distribuire_carte(self, num, carte):
         if num == 2:
@@ -120,6 +129,9 @@ class Giocatore:
         elif 21 >= self.punti > banco.punti or banco.punti > 21 > self.punti:
             self._scommessa *= 2
             print(f"Hai vinto!! Riscuoti {self._scommessa} euro!!")
+        elif self.punti == 21 and len(self.mano) > 2 and banco.punti == 21 and len(banco.mano) == 2:
+            print(f"Hai totalizzato {self.punti}, ma il banco ha fatto Blackjack! Hai perso {self.scommessa} euro!!")
+            self._scommessa = 0
         else:
             print(f"Hai perso {self._scommessa} euro!!")
             self._scommessa = 0
@@ -196,12 +208,16 @@ class Giocatore:
             self.distribuire_carte(turno, carte)
             self.mostra_mano()
             self.calcola_punteggio(banco)
+            print()
             turno += 1
             if self.punti < 21:
                 dec = input("Vuoi continuare (prendere/lasciare)? ").capitalize()
                 while dec != "Prendere" and dec != "Lasciare":
                     dec= input("Devi scegliere tra <prendere> e <lasciare>: ").capitalize()
+            else:
+                break
             time.sleep(1)
+        banco.turni += 1
 
 class Banco(Giocatore):
     def __init__(self):
@@ -209,6 +225,7 @@ class Banco(Giocatore):
         self.mano = []
         self.grafica_mano = []
         self.punti = 0
+        self.turni = 0
 
     def mostra_mano(self):
         super().mostra_mano()
@@ -222,12 +239,12 @@ class Banco(Giocatore):
     def prendere(self, carte, banco):
         turn = 3
         while self.punti < 17:
-            print()
             self.distribuire_carte(turn, carte)
             self.mostra_mano()
             self.calcola_punteggio(banco)
             time.sleep(1)
             turn += 1
+            print()
 
 class Game:
     is_running = True

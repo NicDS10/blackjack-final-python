@@ -14,7 +14,7 @@ def main():
     while Game.is_running:
         carte.mazzo = []
         player.mano, player.grafica_mano, player.punti = [], [], 0
-        banco.mano, banco.grafica_mano, banco.punti = [], [], 0
+        banco.mano, banco.grafica_mano, banco.punti, banco.turni = [], [], 0, 0
         carte.crea_mazzo(banco, player)
         player.distribuire_carte(2, carte)
         print()
