@@ -1,5 +1,5 @@
 import random
-# import time
+import time
 
 class Carta:
     def __init__(self, figura, seme, nome, valore):
@@ -83,6 +83,7 @@ class Giocatore:
         for riga in range(7):
             for sezione in self.grafica_mano:
                 print(sezione[horiz], end=" ")
+                time.sleep(0.03)
             horiz += 1
             print()
 
@@ -131,18 +132,20 @@ class Giocatore:
             Game.is_running = False
         old_bet = self._scommessa
 
-        nuova_scommessa = input("Inserisci la nuova scommessa: ")
-        while self._scommessa == 0:
-            try:
-                nuova_scommessa = int(nuova_scommessa)
-                if nuova_scommessa <= 0:
-                    nuova_scommessa = int(input("Devi inserire un numero maggiore di 0: "))
-                else:
-                    self._scommessa = nuova_scommessa
-            except ValueError:
-                nuova_scommessa = input("Devi inserire un numero: ")
+        if self._scommessa == 0 and Game.is_running:
+            nuova_scommessa = input("Inserisci la nuova scommessa: ")
+            while True:
+                try:
+                    nuova_scommessa = int(nuova_scommessa)
+                    if nuova_scommessa <= 0:
+                        nuova_scommessa = int(input("Devi inserire un numero maggiore di 0: "))
+                    else:
+                        self._scommessa = nuova_scommessa
+                        break
+                except ValueError:
+                    nuova_scommessa = input("Devi inserire un numero: ")
 
-        if old_bet > 0:
+        if old_bet > 0 and Game.is_running:
             decision = input("Vuoi aggiungere una scommessa (Sì/No)? ").capitalize()
             while decision != "Sì" and decision != "Si" and decision != "No":
                 decision = input("Devi scegliere tra <Sì> e <No>: ").capitalize()
@@ -168,6 +171,9 @@ class Giocatore:
         else:
             if self.punti + 11 > 21:
                 carta.valore = 1
+            elif self.punti + 11 == 21:
+                carta.valore = 11
+                print(f"Hai fatto Blackjack {self.nome}!")
             else:
                 value = int(input("Inserisci un valore per l'asso (1/11): "))
                 while True:
@@ -186,13 +192,16 @@ class Giocatore:
         turno = 3
         dec = "Prendere"
         while self.punti < 21 and dec == "Prendere":
+            print()
             self.distribuire_carte(turno, carte)
             self.mostra_mano()
             self.calcola_punteggio(banco)
             turno += 1
-            dec = input("Vuoi continuare (prendere/lasciare)? ").capitalize()
-            while dec != "Prendere" and dec != "Lasciare":
-                dec= input("Devi scegliere tra <prendere> e <lasciare>: ").capitalize()
+            if self.punti < 21:
+                dec = input("Vuoi continuare (prendere/lasciare)? ").capitalize()
+                while dec != "Prendere" and dec != "Lasciare":
+                    dec= input("Devi scegliere tra <prendere> e <lasciare>: ").capitalize()
+            time.sleep(1)
 
 class Banco(Giocatore):
     def __init__(self):
@@ -213,9 +222,11 @@ class Banco(Giocatore):
     def prendere(self, carte, banco):
         turn = 3
         while self.punti < 17:
+            print()
             self.distribuire_carte(turn, carte)
             self.mostra_mano()
             self.calcola_punteggio(banco)
+            time.sleep(1)
             turn += 1
 
 class Game:
