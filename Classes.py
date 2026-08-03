@@ -98,6 +98,8 @@ class Giocatore:
         if self.mano[0].valore == 0 or banco.turni > 1:
             print(f"Il punteggio del banco è {self.punti}")
             banco.turni += 1
+            if self.punti == 21 and len(self.mano) == 2:
+                print("Il banco ha fatto Blackjack!!")
             if self.punti > 21:
                 print("Il banco ha sballato!")
         else:

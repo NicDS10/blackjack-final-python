@@ -1,4 +1,5 @@
 from Classes import Giocatore, Banco, Mazzo, Game
+import time
 
 def main():
     nome = input("Inserisci il tuo nome: ")
