@@ -97,11 +97,11 @@ class Giocatore:
         self.punti += (punteggio - self.punti)
         if self.mano[0].valore == 0 or banco.turni > 1:
             print(f"Il punteggio del banco è {self.punti}")
-            banco.turni += 1
             if self.punti == 21 and len(self.mano) == 2:
                 print("Il banco ha fatto Blackjack!!")
             if self.punti > 21:
                 print("Il banco ha sballato!")
+                banco.turni += 1
         else:
             print(f"Il tuo punteggio è {self.punti}")
             if self.punti > 21:
@@ -215,7 +215,7 @@ class Giocatore:
             if self.punti < 21:
                 dec = input("Vuoi continuare (prendere/lasciare)? ").capitalize()
                 while dec != "Prendere" and dec != "Lasciare":
-                    dec= input("Devi scegliere tra <prendere> e <lasciare>: ").capitalize()
+                    dec = input("Devi scegliere tra <prendere> e <lasciare>: ").capitalize()
             else:
                 break
             time.sleep(1)
