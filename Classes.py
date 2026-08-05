@@ -128,7 +128,7 @@ class Giocatore:
             print(f"Blackjack! Riscuoti {self._scommessa} euro!!")
         elif self.punti == banco.punti or (self.punti > 21 and banco.punti > 21):
             print(f"La tua scommessa rimane intoccata, ed ammonta a {self._scommessa} euro!!")
-        elif 21 >= self.punti > banco.punti or banco.punti > 21 > self.punti:
+        elif 21 >= self.punti > banco.punti or banco.punti > 21 >= self.punti:
             self._scommessa *= 2
             print(f"Hai vinto!! Riscuoti {self._scommessa} euro!!")
         elif self.punti == 21 and len(self.mano) > 2 and banco.punti == 21 and len(banco.mano) == 2:
