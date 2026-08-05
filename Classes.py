@@ -95,7 +95,7 @@ class Giocatore:
             else:
                 punteggio += carta.valore
         self.punti += (punteggio - self.punti)
-        if self.mano[0].valore == 0 or banco.turni > 1:
+        if self.mano[0].valore == 0 or banco.turni > 0:
             print(f"Il punteggio del banco è {self.punti}")
             if self.punti == 21 and len(self.mano) == 2:
                 print("Il banco ha fatto Blackjack!!")
@@ -237,6 +237,7 @@ class Banco(Giocatore):
             self.calcola_punteggio(banco)
             time.sleep(1)
             turn += 1
+            banco.turni += 1
             print()
 
 class Game:
